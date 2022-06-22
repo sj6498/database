@@ -214,7 +214,7 @@ public class Table
 
         List <Comparable []> rows = new ArrayList <> ();
         
-
+        rows.add(index.get(keyVal));
         //  T O   B E   I M P L E M E N T E D 
 
         return new Table (name + count++, attribute, domain, key, rows);
@@ -234,8 +234,15 @@ public class Table
         if (! compatible (table2)) return null;
 
         List <Comparable []> rows = new ArrayList <> ();
-
-        //  T O   B E   I M P L E M E N T E D 
+        for (Comparable [] tup : this.tuples) 	
+        {	
+        	rows.add(tup);	
+        }	
+        for (Comparable [] tup : table2.tuples) 	
+        {	
+        	rows.add(tup);	
+        }	
+        	
 
         return new Table (name + count++, attribute, domain, key, rows);
     } // union
@@ -255,8 +262,15 @@ public class Table
         if (! compatible (table2)) return null;
 
         List <Comparable []> rows = new ArrayList <> ();
+        for (Comparable[] tup:this.tuples)
+        {
+            if(!table2.tuples.contains(tup))
+            {
+                rows.add(tup);
+            }
+        }
 
-        //  T O   B E   I M P L E M E N T E D 
+   
 
         return new Table (name + count++, attribute, domain, key, rows);
     } // minus
