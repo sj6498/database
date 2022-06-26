@@ -296,10 +296,41 @@ public class Table
         var t_attrs = attributes1.split (" ");
         var u_attrs = attributes2.split (" ");
         var rows    = new ArrayList <Comparable []> ();
-
+        	        
+        
         //  T O   B E   I M P L E M E N T E D 
+        for(var tup_left: this.tuples) {
+        	var val_attr1 = extract(tup_left, t_attrs ); 
+        	
+        	for(var tup_right: table2.tuples) {
+        		var val_attr2 = table2.extract(tup_right, u_attrs); 
+        			
+        		boolean equal = true; 
+        		for(int i = 0; i < val_attr1.length; i++) {
+        			if(val_attr1[i].equals(val_attr2[i]) == false){
+        				equal = false; 
+        				break; 
+        			}
+        		}
+        		
+        		if(equal) {
+        			rows.add(concat(tup_left, tup_right)); 
+        		}
+        	}
+        }
+        
+        // Renaming duplicate attributes 
+        String[] table2_new_attribute = table2.attribute.clone(); 
+        
+        for(int i = 0; i < attribute.length; i++) {
+        	for(int j = 0; j < table2.attribute.length; j++) {
+        		if(attribute[i].equals(table2.attribute[j])) {
+        			table2_new_attribute[j] = new String(attribute[i] + "2"); 
+        		}
+        	}
+        }
 
-        return new Table (name + count++, concat (attribute, table2.attribute),
+        return new Table (name + count++, concat (attribute, table2_new_attribute),
                                           concat (domain, table2.domain), key, rows);
     } // join
 
@@ -350,11 +381,57 @@ public class Table
 
         var rows = new ArrayList <Comparable []> ();
 
-        //  T O   B E   I M P L E M E N T E D 
-
-        // FIX - eliminate duplicate columns
-        return new Table (name + count++, concat (attribute, table2.attribute),
-                                          concat (domain, table2.domain), key, rows);
+        String common_attribute = ""; 
+        
+        for(int i = 0; i < attribute.length; i++) {
+        	for(int j = 0; j < table2.attribute.length; j++) {
+        		if(attribute[i].equals(table2.attribute[j])) {
+        			if(common_attribute.isEmpty()) {
+        				common_attribute = attribute[i]; 
+        			}
+        			else {
+        				common_attribute = common_attribute + " " + attribute[i]; 
+        			}
+        			break; 
+        		}
+        	}
+        }
+        
+        Table return_table = join(common_attribute, common_attribute, table2); 
+        
+        
+        // Eliminating duplicate columns
+        var common_attribute_list = (common_attribute.split (" "));
+        String projection_param = ""; 
+        
+        for(int i = 0; i < attribute.length; i++) {
+        	if(i == 0) {
+        		projection_param = attribute[i]; 
+        	}
+        	else {
+        		projection_param = projection_param + " " + attribute[i]; 
+        	}
+        }
+        
+        for(int i = 0; i < table2.attribute.length; i++) {
+        	boolean found = false;
+        	
+        	for(int j = 0; j < common_attribute_list.length; j++) {
+        		if(common_attribute_list[j].equals(table2.attribute[i])) {
+        			found = true;
+        			break;
+        		}
+        	}
+        	
+        	if(found == false) {
+        		projection_param = projection_param + " " + table2.attribute[i];
+        	}
+        }
+        
+        
+        return return_table.project(projection_param);
+        /*return new Table (name + count++, concat (attribute, table2.attribute),
+                                          concat (domain, table2.domain), key, rows);*/
     } // join
 
     /************************************************************************************
