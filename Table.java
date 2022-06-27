@@ -1,4 +1,3 @@
-
 /****************************************************************************************
  * @file  Table.java
  *
@@ -21,7 +20,7 @@ import static java.lang.System.out;
  * Missing are update and delete data manipulation operators.
  */
 public class Table
-       implements Serializable
+        implements Serializable
 {
     /** Relative path for storage directory
      */
@@ -76,10 +75,10 @@ public class Table
     private static Map <KeyType, Comparable []> makeMap ()
     {
         return switch (mType) {
-        case TREE_MAP    -> new TreeMap <> ();
-        case LINHASH_MAP -> new LinHashMap <> (KeyType.class, Comparable [].class);
+            case TREE_MAP    -> new TreeMap <> ();
+            case LINHASH_MAP -> new LinHashMap <> (KeyType.class, Comparable [].class);
 //      case BPTREE_MAP  -> new BpTreeMap <> (KeyType.class, Comparable [].class);
-        default          -> null;
+            default          -> null;
         }; // switch
     } // makeMap
 
@@ -110,7 +109,7 @@ public class Table
      * @param _attribute  the string containing attributes names
      * @param _domain     the string containing attribute domains (data types)
      * @param _key        the primary key
-     */  
+     */
     public Table (String _name, String [] _attribute, Class [] _domain, String [] _key)
     {
         name      = _name;
@@ -130,7 +129,7 @@ public class Table
      * @param _domain     the string containing attribute domains (data types)
      * @param _key        the primary key
      * @param _tuples     the list of tuples containing the data
-     */  
+     */
     public Table (String _name, String [] _attribute, Class [] _domain, String [] _key,
                   List <Comparable []> _tuples)
     {
@@ -179,7 +178,10 @@ public class Table
 
         List <Comparable []> rows = new ArrayList <> ();
 
-        //  T O   B E   I M P L E M E N T E D 
+        //  T O   B E   I M P L E M E N T E D
+        for (Comparable[] tuple : this.tuples) {
+            rows.add(extract(tuple, attrs));
+        }
 
         return new Table (name + count++, attrs, colDomain, newKey, rows);
     } // project
@@ -197,8 +199,8 @@ public class Table
         out.println ("RA> " + name + ".select (" + predicate + ")");
 
         return new Table (name + count++, attribute, domain, key,
-                   tuples.stream ().filter (t -> predicate.test (t))
-                                   .collect (Collectors.toList ()));
+                tuples.stream ().filter (t -> predicate.test (t))
+                        .collect (Collectors.toList ()));
     } // select
 
     /************************************************************************************
@@ -213,7 +215,7 @@ public class Table
         out.println ("RA> " + name + ".select (" + keyVal + ")");
 
         List <Comparable []> rows = new ArrayList <> ();
-        
+
         rows.add(index.get(keyVal));
         //  T O   B E   I M P L E M E N T E D 
 
@@ -234,15 +236,15 @@ public class Table
         if (! compatible (table2)) return null;
 
         List <Comparable []> rows = new ArrayList <> ();
-        for (Comparable [] tup : this.tuples) 	
-        {	
-        	rows.add(tup);	
-        }	
-        for (Comparable [] tup : table2.tuples) 	
-        {	
-        	rows.add(tup);	
-        }	
-        	
+        for (Comparable [] tup : this.tuples)
+        {
+            rows.add(tup);
+        }
+        for (Comparable [] tup : table2.tuples)
+        {
+            rows.add(tup);
+        }
+
 
         return new Table (name + count++, attribute, domain, key, rows);
     } // union
@@ -270,7 +272,7 @@ public class Table
             }
         }
 
-   
+
 
         return new Table (name + count++, attribute, domain, key, rows);
     } // minus
@@ -291,47 +293,47 @@ public class Table
     public Table join (String attributes1, String attributes2, Table table2)
     {
         out.println ("RA> " + name + ".join (" + attributes1 + ", " + attributes2 + ", "
-                                               + table2.name + ")");
+                + table2.name + ")");
 
         var t_attrs = attributes1.split (" ");
         var u_attrs = attributes2.split (" ");
         var rows    = new ArrayList <Comparable []> ();
-        	        
-        
+
+
         //  T O   B E   I M P L E M E N T E D 
         for(var tup_left: this.tuples) {
-        	var val_attr1 = extract(tup_left, t_attrs ); 
-        	
-        	for(var tup_right: table2.tuples) {
-        		var val_attr2 = table2.extract(tup_right, u_attrs); 
-        			
-        		boolean equal = true; 
-        		for(int i = 0; i < val_attr1.length; i++) {
-        			if(val_attr1[i].equals(val_attr2[i]) == false){
-        				equal = false; 
-        				break; 
-        			}
-        		}
-        		
-        		if(equal) {
-        			rows.add(concat(tup_left, tup_right)); 
-        		}
-        	}
+            var val_attr1 = extract(tup_left, t_attrs );
+
+            for(var tup_right: table2.tuples) {
+                var val_attr2 = table2.extract(tup_right, u_attrs);
+
+                boolean equal = true;
+                for(int i = 0; i < val_attr1.length; i++) {
+                    if(val_attr1[i].equals(val_attr2[i]) == false){
+                        equal = false;
+                        break;
+                    }
+                }
+
+                if(equal) {
+                    rows.add(concat(tup_left, tup_right));
+                }
+            }
         }
-        
+
         // Renaming duplicate attributes 
-        String[] table2_new_attribute = table2.attribute.clone(); 
-        
+        String[] table2_new_attribute = table2.attribute.clone();
+
         for(int i = 0; i < attribute.length; i++) {
-        	for(int j = 0; j < table2.attribute.length; j++) {
-        		if(attribute[i].equals(table2.attribute[j])) {
-        			table2_new_attribute[j] = new String(attribute[i] + "2"); 
-        		}
-        	}
+            for(int j = 0; j < table2.attribute.length; j++) {
+                if(attribute[i].equals(table2.attribute[j])) {
+                    table2_new_attribute[j] = new String(attribute[i] + "2");
+                }
+            }
         }
 
         return new Table (name + count++, concat (attribute, table2_new_attribute),
-                                          concat (domain, table2.domain), key, rows);
+                concat (domain, table2.domain), key, rows);
     } // join
 
     /************************************************************************************
@@ -381,54 +383,54 @@ public class Table
 
         var rows = new ArrayList <Comparable []> ();
 
-        String common_attribute = ""; 
-        
+        String common_attribute = "";
+
         for(int i = 0; i < attribute.length; i++) {
-        	for(int j = 0; j < table2.attribute.length; j++) {
-        		if(attribute[i].equals(table2.attribute[j])) {
-        			if(common_attribute.isEmpty()) {
-        				common_attribute = attribute[i]; 
-        			}
-        			else {
-        				common_attribute = common_attribute + " " + attribute[i]; 
-        			}
-        			break; 
-        		}
-        	}
+            for(int j = 0; j < table2.attribute.length; j++) {
+                if(attribute[i].equals(table2.attribute[j])) {
+                    if(common_attribute.isEmpty()) {
+                        common_attribute = attribute[i];
+                    }
+                    else {
+                        common_attribute = common_attribute + " " + attribute[i];
+                    }
+                    break;
+                }
+            }
         }
-        
-        Table return_table = join(common_attribute, common_attribute, table2); 
-        
-        
+
+        Table return_table = join(common_attribute, common_attribute, table2);
+
+
         // Eliminating duplicate columns
         var common_attribute_list = (common_attribute.split (" "));
-        String projection_param = ""; 
-        
+        String projection_param = "";
+
         for(int i = 0; i < attribute.length; i++) {
-        	if(i == 0) {
-        		projection_param = attribute[i]; 
-        	}
-        	else {
-        		projection_param = projection_param + " " + attribute[i]; 
-        	}
+            if(i == 0) {
+                projection_param = attribute[i];
+            }
+            else {
+                projection_param = projection_param + " " + attribute[i];
+            }
         }
-        
+
         for(int i = 0; i < table2.attribute.length; i++) {
-        	boolean found = false;
-        	
-        	for(int j = 0; j < common_attribute_list.length; j++) {
-        		if(common_attribute_list[j].equals(table2.attribute[i])) {
-        			found = true;
-        			break;
-        		}
-        	}
-        	
-        	if(found == false) {
-        		projection_param = projection_param + " " + table2.attribute[i];
-        	}
+            boolean found = false;
+
+            for(int j = 0; j < common_attribute_list.length; j++) {
+                if(common_attribute_list[j].equals(table2.attribute[i])) {
+                    found = true;
+                    break;
+                }
+            }
+
+            if(found == false) {
+                projection_param = projection_param + " " + table2.attribute[i];
+            }
         }
-        
-        
+
+
         return return_table.project(projection_param);
         /*return new Table (name + count++, concat (attribute, table2.attribute),
                                           concat (domain, table2.domain), key, rows);*/
@@ -443,7 +445,7 @@ public class Table
     public int col (String attr)
     {
         for (var i = 0; i < attribute.length; i++) {
-           if (attr.equals (attribute [i])) return i;
+            if (attr.equals (attribute [i])) return i;
         } // for
 
         return -1;  // not found
@@ -636,7 +638,7 @@ public class Table
      *          with the given domains
      */
     private boolean typeCheck (Comparable [] t)
-    { 
+    {
         //  T O   B E   I M P L E M E N T E D 
 
         return true;
@@ -682,4 +684,3 @@ public class Table
     } // extractDom
 
 } // Table class
-
