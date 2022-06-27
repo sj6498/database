@@ -33,5 +33,7 @@ We used sbt for building, compilation and running project.
 Contribution
 
 Shanmukha Sai Jasti- implemented the union and minus commands. Developed the UML class diagram. Wrote the manager summary.
+
 Rezwan Mahmud- implemented the join operations, environment setup, intigrated the code and wrote the participant summary.
+
 Jashwanthreddy Katamreddy- implemented project and select commands. Build the .sbt file. Wrote the participant summary.
