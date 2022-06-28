@@ -447,7 +447,7 @@ public class Table
      */
     
     public String[] remove_duplicate(String[] sentence) {
-        List ret = new ArrayList<String>();
+        ArrayList<String> ret = new ArrayList<String>();
         
         for(int i = 0; i < sentence.length; i++) {
         	boolean found = false;
