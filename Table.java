@@ -366,6 +366,31 @@ public class Table
 
         return null;
     } // h_join
+    
+    public String[] remove_duplicate(String[] sentence) {
+        List ret = new ArrayList<String>();
+        
+        for(int i = 0; i < sentence.length; i++) {
+        	boolean found = false;
+        	for(int j = i + 1; j < sentence.length; j++) {
+        		if(sentence[i].equals(sentence[j])) {
+        			found = true;
+        			break;
+        		}
+        	}
+        	
+        	if(!found) {
+        		ret.add(sentence[i]); 
+        	}
+        }
+        
+        String[] ret_string = new String[ret.size()];
+        for(int i = 0; i < ret.size(); i++) {
+        	ret_string[i] = (String) ret.get(i); 
+        }
+        
+        return ret_string; 
+    }
 
     /************************************************************************************
      * Join this table and table2 by performing an "natural join".  Tuples from both tables
@@ -429,11 +454,12 @@ public class Table
                 projection_param = projection_param + " " + table2.attribute[i];
             }
         }
-
-
-        return return_table.project(projection_param);
-        /*return new Table (name + count++, concat (attribute, table2.attribute),
-                                          concat (domain, table2.domain), key, rows);*/
+        		;
+        return_table = return_table.project(projection_param);
+        
+        // Updating keys and returning the final table
+        return new Table (name + count++, return_table.attribute,
+                                          return_table.domain, remove_duplicate(concat(key, table2.key)), return_table.tuples);
     } // join
 
     /************************************************************************************
