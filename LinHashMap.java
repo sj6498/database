@@ -134,7 +134,7 @@ public class LinHashMap <K, V>
         }
 
         //  T O   B E   I M P L E M E N T E D
-            
+
         return enSet;
     } // entrySet
 
@@ -201,9 +201,9 @@ public class LinHashMap <K, V>
 
         out.println ("-------------------------------------------");
     } // print
- 
+
     /********************************************************************************
-     * Return the size (SLOTS * number of home buckets) of the hash table. 
+     * Return the size (SLOTS * number of home buckets) of the hash table.
      * @return  the size of the hash table
      */
     public int size ()
@@ -221,9 +221,54 @@ public class LinHashMap <K, V>
     {
         out.println ("split: bucket chain " + isplit);
 
-        //  T O   B E   I M P L E M E N T E D
+        // Spliting isplit into two buckets. The new bucket is being added at the end
+        // of hTable
+        hTable.add (new Bucket ());
+
+        // Keeping a reference to the bucket to be split
+        Bucket oldBucket = hTable.get(isplit);
+
+        // Replacing the bucket to be split with a fresh empty bucket
+        hTable.set(isplit, new Bucket());
+
+
+        // Re-hashing the keys from the oldBucket
+        while(oldBucket != null) {
+        	for(int i = 0; i < oldBucket.nKeys; i++) {
+
+        		int index = h2(oldBucket.key[i]);
+        		var b = hTable.get(index);
+
+        		// Re-hashing oldBucket[i]
+        		boolean found = false;
+         	    while (true)  {
+    	            if (b.nKeys < SLOTS) { b.add (oldBucket.key[i], oldBucket.value[i]); found = true; break;}
+
+    	            if (b.next != null) b = b.next;
+    	            else break;
+    	        }
+
+
+         	    if(found == false) {
+         	    	// Need a new bucket in the chain
+         	    	var bn = new Bucket ();
+         	        bn.add (oldBucket.key[i], oldBucket.value[i]);
+         	        b.next = bn;
+         	    }
+        	}
+        	oldBucket = oldBucket.next;
+        }
+
+        isplit = isplit + 1;
+
+        if(isplit == mod2) {
+        	mod1 = mod2;
+        	mod2 = mod2 * 2;
+        	isplit = 0;
+        }
 
     } // split
+
 
     /********************************************************************************
      * Return the load factor for the hash table.
@@ -277,7 +322,7 @@ public class LinHashMap <K, V>
      */
     public static void main (String [] args)
     {
-        var totalKeys = 40;
+        var totalKeys = 40000;
         var RANDOMLY  = false;
 
         LinHashMap <Integer, Integer> ht = new LinHashMap <> (Integer.class, Integer.class);
