@@ -176,7 +176,6 @@ public class Table
 
         List <Comparable []> rows = new ArrayList <> ();
 
-        //  T O   B E   I M P L E M E N T E D
         for (Comparable[] tuple : this.tuples) {
             rows.add(extract(tuple, attrs));
         }
@@ -215,7 +214,6 @@ public class Table
         List <Comparable []> rows = new ArrayList <> ();
 
         rows.add(index.get(keyVal));
-        //  T O   B E   I M P L E M E N T E D 
 
         return new Table (name + count++, attribute, domain, key, rows);
     } // select
@@ -270,8 +268,6 @@ public class Table
             }
         }
 
-
-
         return new Table (name + count++, attribute, domain, key, rows);
     } // minus
 
@@ -297,8 +293,8 @@ public class Table
         var u_attrs = attributes2.split (" ");
         var rows    = new ArrayList <Comparable []> ();
 
-
-        //  T O   B E   I M P L E M E N T E D 
+        
+        // Nested loop for join algorithm
         for(var tup_left: this.tuples) {
             var val_attr1 = extract(tup_left, t_attrs );
 
@@ -365,8 +361,91 @@ public class Table
         return null;
     } // h_join
     
+
+
+    /************************************************************************************
+     * Join this table and table2 by performing an "natural join".  Tuples from both tables
+     * are compared requiring common attributes to be equal.  The duplicate column is also
+     * eliminated.
+     *
+     * #usage movieStar.join (starsIn)
+     *
+     * @param table2  the rhs table in the join operation
+     * @return  a table with tuples satisfying the equality predicate
+     */
+    public Table join (Table table2)
+    {
+        out.println ("RA> " + name + ".join (" + table2.name + ")");
+
+        var rows = new ArrayList <Comparable []> ();
+        
+        // Finding a list of common attributes
+        String common_attribute = "";
+        for(int i = 0; i < attribute.length; i++) {
+            for(int j = 0; j < table2.attribute.length; j++) {
+                if(attribute[i].equals(table2.attribute[j])) {
+                    if(common_attribute.isEmpty()) {
+                        common_attribute = attribute[i];
+                    }
+                    else {
+                        common_attribute = common_attribute + " " + attribute[i];
+                    }
+                    break;
+                }
+            }
+        }
+        	
+        // Performing equi-join on common attributes
+        Table return_table = join(common_attribute, common_attribute, table2);
+
+
+        // Eliminating duplicate columns
+        var common_attribute_list = (common_attribute.split (" "));
+        	
+        // Taking all the columns from the first table
+        String projection_param = "";
+        for(int i = 0; i < attribute.length; i++) {
+            if(i == 0) {
+                projection_param = attribute[i];
+            }
+            else {
+                projection_param = projection_param + " " + attribute[i];
+            }
+        }
+        
+        // Finding unique columns of the second table which did not appear in the first table
+        for(int i = 0; i < table2.attribute.length; i++) {
+            boolean found = false;
+
+            for(int j = 0; j < common_attribute_list.length; j++) {
+                if(common_attribute_list[j].equals(table2.attribute[i])) {
+                    found = true;
+                    break;
+                }
+            }
+
+            if(found == false) {
+                projection_param = projection_param + " " + table2.attribute[i];
+            }
+        }
+        		;
+        return_table = return_table.project(projection_param);
+        
+        // Updating primary key of the new table and returning the final table
+        return new Table (name + count++, return_table.attribute,
+                                          return_table.domain, remove_duplicate(concat(key, table2.key)), return_table.tuples);
+    } // join
+    
+    
+    /************************************************************************************
+     * Given a sentence with duplicate words, returns a list of unique words
+     * Used to make the new primary key after natural joining two tabels
+     * 
+     * @return a list of strings 
+     */
+    
     public String[] remove_duplicate(String[] sentence) {
-        List ret = new ArrayList<String>();
+        ArrayList<String> ret = new ArrayList<String>();
         
         for(int i = 0; i < sentence.length; i++) {
         	boolean found = false;
@@ -389,76 +468,6 @@ public class Table
         
         return ret_string; 
     }
-
-    /************************************************************************************
-     * Join this table and table2 by performing an "natural join".  Tuples from both tables
-     * are compared requiring common attributes to be equal.  The duplicate column is also
-     * eliminated.
-     *
-     * #usage movieStar.join (starsIn)
-     *
-     * @param table2  the rhs table in the join operation
-     * @return  a table with tuples satisfying the equality predicate
-     */
-    public Table join (Table table2)
-    {
-        out.println ("RA> " + name + ".join (" + table2.name + ")");
-
-        var rows = new ArrayList <Comparable []> ();
-
-        String common_attribute = "";
-
-        for(int i = 0; i < attribute.length; i++) {
-            for(int j = 0; j < table2.attribute.length; j++) {
-                if(attribute[i].equals(table2.attribute[j])) {
-                    if(common_attribute.isEmpty()) {
-                        common_attribute = attribute[i];
-                    }
-                    else {
-                        common_attribute = common_attribute + " " + attribute[i];
-                    }
-                    break;
-                }
-            }
-        }
-
-        Table return_table = join(common_attribute, common_attribute, table2);
-
-
-        // Eliminating duplicate columns
-        var common_attribute_list = (common_attribute.split (" "));
-        String projection_param = "";
-
-        for(int i = 0; i < attribute.length; i++) {
-            if(i == 0) {
-                projection_param = attribute[i];
-            }
-            else {
-                projection_param = projection_param + " " + attribute[i];
-            }
-        }
-
-        for(int i = 0; i < table2.attribute.length; i++) {
-            boolean found = false;
-
-            for(int j = 0; j < common_attribute_list.length; j++) {
-                if(common_attribute_list[j].equals(table2.attribute[i])) {
-                    found = true;
-                    break;
-                }
-            }
-
-            if(found == false) {
-                projection_param = projection_param + " " + table2.attribute[i];
-            }
-        }
-        		;
-        return_table = return_table.project(projection_param);
-        
-        // Updating keys and returning the final table
-        return new Table (name + count++, return_table.attribute,
-                                          return_table.domain, remove_duplicate(concat(key, table2.key)), return_table.tuples);
-    } // join
 
     /************************************************************************************
      * Return the column position for the given attribute name.
