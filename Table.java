@@ -341,7 +341,37 @@ public class Table
      */
     public Table i_join (String attributes1, String attributes2, Table table2)
     {
-        return null;
+    	out.println ("RA> " + name + ".i_join (" + attributes1 + ", " + attributes2 + ", "
+                + table2.name + ")");
+
+        var t_attrs = attributes1.split (" ");
+        var u_attrs = attributes2.split (" ");
+        var rows    = new ArrayList <Comparable []> ();
+
+        
+        // Single loop for i-join algorithm
+        for(var tup_left: this.tuples) {
+            var val_attr1 = extract(tup_left, t_attrs );
+            	
+            KeyType kt = new KeyType(val_attr1); 
+            if(table2.index.containsKey(kt)) {
+            	rows.add(concat(tup_left, table2.index.get(kt))); 
+            }
+        }
+
+        // Renaming duplicate attributes 
+        String[] table2_new_attribute = table2.attribute.clone();
+
+        for(int i = 0; i < attribute.length; i++) {
+            for(int j = 0; j < table2.attribute.length; j++) {
+                if(attribute[i].equals(table2.attribute[j])) {
+                    table2_new_attribute[j] = new String(attribute[i] + "2");
+                }
+            }
+        }
+
+        return new Table (name + count++, concat (attribute, table2_new_attribute),
+                concat (domain, table2.domain), key, rows);
     } // i_join
 
     /************************************************************************************
@@ -497,6 +527,15 @@ public class Table
         out.println ("DML> insert into " + name + " values ( " + Arrays.toString (tup) + " )");
 
         if (typeCheck (tup)) {
+        	
+        	KeyType current_key = new KeyType(extract(tup, key));  
+        	if(index.containsKey(current_key) == true) {
+        		System.out.println("Duplicate item can not be inserted."); 
+        		return false;
+        	}
+        	
+        	// Not a duplicate item
+        	index.put(current_key, tup);
             tuples.add (tup);
             var keyVal = new Comparable [key.length];
             var cols   = match (key);
