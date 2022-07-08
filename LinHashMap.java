@@ -112,9 +112,6 @@ public class LinHashMap <K, V>
     {
         classK = _classK;
         classV = _classV;
-        if(classK == null) {
-        	System.out.println("************************ALAS"); 
-        }
         mod1   = 4;                                                          // initial size
         mod2   = 2 * mod1;
         hTable = new ArrayList <> ();
