@@ -57,7 +57,7 @@ public class Table
 
     /** Index into tuples (maps key to tuple number).
      */
-    private final Map <KeyType, Comparable []> index;
+    private final LinHashMap <KeyType, Comparable []> index;
 
     /** The supported map types.
      */
@@ -115,7 +115,7 @@ public class Table
         domain    = _domain;
         key       = _key;
         tuples    = new ArrayList <> ();
-        index     = makeMap ();
+		index = new LinHashMap<>(KeyType.class, Comparable[].class);
 
     } // primary constructor
 
@@ -136,7 +136,7 @@ public class Table
         domain    = _domain;
         key       = _key;
         tuples    = _tuples;
-        index     = makeMap ();
+		index = new LinHashMap<>(KeyType.class, Comparable[].class);
     } // constructor
 
     /************************************************************************************

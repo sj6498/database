@@ -138,6 +138,13 @@ class MovieDB
         out.println ();
         var t_join = movie.join ("studioName", "name", studio);
         t_join.print ();
+        
+        
+        //--------------------- i-join: movie I-JOIN studio ON studioName = name
+
+        out.println ();
+        var i_join = movie.i_join ("studioName", "name", studio);
+        i_join.print ();
 
         //--------------------- natural join: movie JOIN studio
 

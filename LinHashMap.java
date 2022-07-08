@@ -112,6 +112,9 @@ public class LinHashMap <K, V>
     {
         classK = _classK;
         classV = _classV;
+        if(classK == null) {
+        	System.out.println("************************ALAS"); 
+        }
         mod1   = 4;                                                          // initial size
         mod2   = 2 * mod1;
         hTable = new ArrayList <> ();
@@ -303,7 +306,7 @@ public class LinHashMap <K, V>
      */
     private int h (Object key)
     {
-        return key.hashCode () % mod1;
+        return ((key.hashCode () % mod1) + mod1) % mod1;
     } // h
 
     /********************************************************************************
@@ -313,7 +316,7 @@ public class LinHashMap <K, V>
      */
     private int h2 (Object key)
     {
-        return key.hashCode () % mod2;
+        return ((key.hashCode () % mod2) + mod2) % mod2;
     } // h2
 
     /********************************************************************************
