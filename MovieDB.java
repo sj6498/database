@@ -7,6 +7,10 @@
 
 import static java.lang.System.out;
 
+import java.nio.charset.Charset;
+import java.util.Random;
+
+
 /*****************************************************************************************
  * The MovieDB class makes a Movie Database.  It serves as a template for making other
  * databases.  See "Database Systems: The Complete Book", second edition, page 26 for more
@@ -18,9 +22,23 @@ class MovieDB
      * Main method for creating, populating and querying a Movie Database.
      * @param args  the command-line arguments
      */
+	
+	static Random rand = new Random(); 
+	static String RandomString() {
+	    byte[] array = new byte[30];
+	    for(int i = 0; i < 30; i++) array[i] = (byte) ((int) 'a' + rand.nextInt(26)); 
+	    String generatedString = new String(array, Charset.forName("UTF-8"));
+		return generatedString; 
+	}
+	
+	static int RandomNumber() {
+		return rand.nextInt(100000);
+	}
+	
     public static void main (String [] args)
     {
         out.println ();
+        int toupleCount = 10; 
 
         var movie = new Table ("movie", "title year length genre studioName producerNo",
                                         "String Integer Integer String String Integer", "title year");
@@ -44,20 +62,31 @@ class MovieDB
         var film1 = new Comparable [] { "Star_Wars_2", 1980, 124, "sciFi", "Fox", 12345 };
         var film2 = new Comparable [] { "Rocky", 1985, 200, "action", "Universal", 12125 };
         var film3 = new Comparable [] { "Rambo", 1978, 100, "action", "Universal", 32355 };
+        
+        
 
         out.println ();
         movie.insert (film0);
         movie.insert (film1);
         movie.insert (film2);
         movie.insert (film3);
-        movie.print ();
+        for(int i = 1; i <= toupleCount; i++) {
+        	var film_i = new Comparable [] { RandomString(), RandomNumber(), RandomNumber(), RandomString(), RandomString(), RandomNumber() };
+        	movie.insert(film_i); 
+        	
+        }
+        //movie.print ();
 
         var film4 = new Comparable [] { "Galaxy_Quest", 1999, 104, "comedy", "DreamWorks", 67890 };
         out.println ();
         cinema.insert (film2);
         cinema.insert (film3);
         cinema.insert (film4);
-        cinema.print ();
+        for(int i = 1; i <= toupleCount; i++) {
+        	var film_i = new Comparable [] { RandomString(), RandomNumber(), RandomNumber(), RandomString(), RandomString(), RandomNumber() };
+        	cinema.insert(film_i); 
+        }
+        //cinema.print ();
 
         var star0 = new Comparable [] { "Carrie_Fisher", "Hollywood", 'F', "9/9/99" };
         var star1 = new Comparable [] { "Mark_Hamill", "Brentwood", 'M', "8/8/88" };
@@ -66,17 +95,22 @@ class MovieDB
         movieStar.insert (star0);
         movieStar.insert (star1);
         movieStar.insert (star2);
-        movieStar.print ();
+        for(int i = 1; i <= toupleCount; i++) {
+        	var star_i = new Comparable [] { RandomString(), RandomString(), 'F', RandomString() };
+        	movieStar.insert(star_i); 
+        }
+        //movieStar.print ();
+
 
         var cast0 = new Comparable [] { "Star_Wars", 1977, "Carrie_Fisher" };
         out.println ();
         starsIn.insert (cast0);
-        starsIn.print ();
+        //starsIn.print ();
 
         var exec0 = new Comparable [] { 9999, "S_Spielberg", "Hollywood", 10000.00 };
         out.println ();
         movieExec.insert (exec0);
-        movieExec.print ();
+        //movieExec.print ();
 
         var studio0 = new Comparable [] { "Fox", "Los_Angeles", 7777 };
         var studio1 = new Comparable [] { "Universal", "Universal_City", 8888 };
@@ -85,20 +119,25 @@ class MovieDB
         studio.insert (studio0);
         studio.insert (studio1);
         studio.insert (studio2);
-        studio.print ();
+        for(int i = 1; i <= toupleCount; i++) {
+        	var studio_i = new Comparable [] { RandomString(), RandomString(), RandomNumber()};
+        	studio.insert(studio_i); 
+        	
+        }
+        //studio.print ();
 
-        movie.save ();
-        cinema.save ();
-        movieStar.save ();
-        starsIn.save ();
-        movieExec.save ();
-        studio.save ();
+        //movie.save ();
+        //cinema.save ();
+        //movieStar.save ();
+        //starsIn.save ();
+        //movieExec.save ();
+        //studio.save ();
 
-        movieStar.printIndex ();
+        //movieStar.printIndex ();
 
         //--------------------- project: title year
 
-        out.println ();
+        /*out.println ();
         var t_project = movie.project ("title year");
         t_project.print ();
 
@@ -132,25 +171,32 @@ class MovieDB
         out.println ();
         var t_minus = movie.minus (cinema);
         t_minus.print ();
+        
 
         //--------------------- equi-join: movie JOIN studio ON studioName = name
 
         out.println ();
+        long startTime = System.nanoTime();
         var t_join = movie.join ("studioName", "name", studio);
         t_join.print ();
+        long elapsedNanos = System.nanoTime() - startTime;
+        System.out.print("TIME TAKEN: " + elapsedNanos);*/
         
         
         //--------------------- i-join: movie I-JOIN studio ON studioName = name
 
         out.println ();
+        long startTime = System.nanoTime();
         var i_join = movie.i_join ("studioName", "name", studio);
-        i_join.print ();
+        i_join.print ();	
+        long elapsedNanos = System.nanoTime() - startTime;
+        System.out.print("TIME TAKEN: " + elapsedNanos);
 
         //--------------------- natural join: movie JOIN studio
 
-        out.println ();
+        /*out.println ();
         var t_join2 = movie.join (cinema);
-        t_join2.print ();
+        t_join2.print ();*/
 
     } // main
 
