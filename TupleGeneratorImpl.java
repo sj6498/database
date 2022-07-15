@@ -27,6 +27,8 @@ public class TupleGeneratorImpl
     private HashMap <Integer, String> tableIndex = new HashMap <> ();
 
     private HashMap <String, String []> tableAttr = new HashMap <> ();
+    
+    public HashMap<String, Table> tableLink = new HashMap<>(); 
 
     private HashMap <String, String []> tableDomain = new HashMap <> ();
 
@@ -51,6 +53,13 @@ public class TupleGeneratorImpl
         tablepks.put (name, primaryKey);
         tablefks.put (name, foreignKey);
         counter++;
+        
+        Table tab = new Table(name, String.join(" ", attribute), String.join(" ", domain), String.join(" ", primaryKey));
+        if(tab == null)
+			System.out.println("ALAAAAAAAAASS");
+        
+        tableLink.put(name, tab); 
+
     } // addRelSchema
     
     /*******************************************************************************************
@@ -66,6 +75,7 @@ public class TupleGeneratorImpl
     {
         addRelSchema (name, attribute.split (" "), domain.split (" "),
                       primaryKey.split (" "), foreignKey);
+        
     } // addRelSchema
 
     /***********************************************************************************

@@ -354,7 +354,7 @@ public class Table
             var val_attr1 = extract(tup_left, t_attrs );
             	
             KeyType kt = new KeyType(val_attr1); 
-            if(table2.index.containsKey(kt)) {
+            if(table2.index.containsKey(kt) && table2.index.get(kt) != null) {
             	rows.add(concat(tup_left, table2.index.get(kt))); 
             }
         }
@@ -524,7 +524,7 @@ public class Table
      */
     public boolean insert (Comparable [] tup)
     {
-        out.println ("DML> insert into " + name + " values ( " + Arrays.toString (tup) + " )");
+        //out.println ("DML> insert into " + name + " values ( " + Arrays.toString (tup) + " )");
 
         if (typeCheck (tup)) {
         	

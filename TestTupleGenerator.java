@@ -21,33 +21,35 @@ public class TestTupleGenerator
     public static void main (String [] args)
     {
         var test = new TupleGeneratorImpl ();
+        var tables = new String [] { "Student", "Professor", "Course", "Teaching", "Transcript" };
 
-        test.addRelSchema ("Student",
+
+        test.addRelSchema (tables[0],
                            "id name address status",
                            "Integer String String String",
                            "id",
                            null);
         
-        test.addRelSchema ("Professor",
+        test.addRelSchema (tables[1],
                            "id name deptId",
                            "Integer String String",
                            "id",
                            null);
         
-        test.addRelSchema ("Course",
+        test.addRelSchema (tables[2],
                            "crsCode deptId crsName descr",
                            "String String String String",
                            "crsCode",
                            null);
         
-        test.addRelSchema ("Teaching",
+        test.addRelSchema (tables[3],
                            "crsCode semester profId",
                            "String String Integer",
                            "crcCode semester",
                            new String [][] {{ "profId", "Professor", "id" },
                                             { "crsCode", "Course", "crsCode" }});
         
-        test.addRelSchema ("Transcript",
+        test.addRelSchema (tables[4],
                            "studId crsCode semester grade",
                            "Integer String String String",
                            "studId crsCode semester",
@@ -55,21 +57,41 @@ public class TestTupleGenerator
                                             { "crsCode", "Course", "crsCode" },
                                             { "crsCode semester", "Teaching", "crsCode semester" }});
 
-        var tables = new String [] { "Student", "Professor", "Course", "Teaching", "Transcript" };
-        var tups   = new int [] { 10000, 1000, 2000, 50000, 5000 };
-    
+        //var tups   = new int [] { 10000, 1000, 2000, 50000, 5000 };
+        //var tups   = new int [] { 5, 5, 5, 5, 5 };
+        
+        
+        //Test:1
+        var tups   = new int [] { 100000, 10, 20, 50, 50000 };
+        
         var resultTest = test.generate (tups);
         
         for (var i = 0; i < resultTest.length; i++) {
             out.println (tables [i]);
             for (var j = 0; j < resultTest [i].length; j++) {
-                for (var k = 0; k < resultTest [i][j].length; k++) {
-                    out.print (resultTest [i][j][k] + ",");
-                } // for
-                out.println ();
+            	test.tableLink.get(tables[i]).insert(resultTest[i][j]); 
+            	
+                //for (var k = 0; k < resultTest [i][j].length; k++) {
+                    //out.print (resultTest [i][j][k] + ",");
+                //} // for
+                //out.println ();
             } // for
-            out.println ();
+            
+            //test.tableLink.get(tables[i]).print(); 
+            //out.println ();
         } // for
+        
+        //--------------------- equi-join: movie JOIN studio ON studioName = name
+
+        
+        out.println ();
+        long startTime = System.nanoTime();
+        var t_join = test.tableLink.get(tables[4]).i_join("studId", "id", test.tableLink.get(tables[0]));
+        long elapsedNanos = System.nanoTime() - startTime;
+        t_join.print ();
+        System.out.print("TIME TAKEN: " + elapsedNanos);
+
+        
     } // main
 
 } // TestTupleGenerator
